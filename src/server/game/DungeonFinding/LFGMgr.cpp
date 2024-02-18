@@ -42,7 +42,7 @@
 
 namespace lfg
 {
-    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
+    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false), m_MinPlayer(2)
     {
         for (uint8 team = 0; team < 2; ++team)
         {
@@ -800,6 +800,11 @@ namespace lfg
               << ". Dungeons (" << uint32(dungeons.size()) << "): " << ConcatenateDungeons(dungeons);
             LOG_DEBUG("lfg", "{}", o.str());
         }*/
+    }
+
+    void LFGMgr::SetMinPlayers(uint32 minPlayers = 2)
+    {
+        m_MinPlayer = MinPlayers;
     }
 
     void LFGMgr::ToggleTesting()
@@ -1829,11 +1834,15 @@ namespace lfg
 
         // check if all have answered and reorder players (leader first)
         bool allAnswered = true;
+        uint32 playerCount = 0;
+
         for (LfgProposalPlayerContainer::const_iterator itPlayers = proposal.players.begin(); itPlayers != proposal.players.end(); ++itPlayers)
+            playerCount++;
+
             if (itPlayers->second.accept != LFG_ANSWER_AGREE)   // No answer (-1) or not accepted (0)
                 allAnswered = false;
 
-        if (!m_Testing && !allAnswered)
+        if (playerCount < m_MinPlayer || !m_Testing && !allAnswered)
         {
             for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
                 SendLfgUpdateProposal(it->first, proposal);

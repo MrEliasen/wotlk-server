@@ -573,6 +573,8 @@ namespace lfg
         static bool HasIgnore(ObjectGuid guid1, ObjectGuid guid2);
         /// Sends queue status to player
         static void SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data);
+        // change min players and time
+        void SetMinPlayers(uint32 minPlayers);
         // debug lfg command
         void ToggleTesting();
         /// For 1 player queue testing
@@ -631,6 +633,7 @@ namespace lfg
         LfgPlayerDataContainer PlayersStore;               ///< Player data
         LfgGroupDataContainer GroupsStore;                 ///< Group data
         bool m_Testing;
+        uint32 m_MinPlayers;
     };
 
     template <typename T, FMT_ENABLE_IF(std::is_enum_v<T>)>
