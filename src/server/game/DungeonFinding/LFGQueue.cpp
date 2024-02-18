@@ -294,31 +294,18 @@ namespace lfg
             return LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS;
 
         // Group with less that MAXGROUPSIZE members always compatible
-        if (!sLFGMgr->IsTesting() && check.size() == 1 && numPlayers < MAXGROUPSIZE && numPlayers > sLFGMgr->MinPlayers())
+        if (!sLFGMgr->IsTesting() && check.size() == 1 && numPlayers < MAXGROUPSIZE && (numPlayers < sLFGMgr->MinPlayers() && sLFGMgr->MinPlayers() > 0))
         {
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(check.front());
             LfgRolesMap roles = itQueue->second.roles;
-            time_t currTime = GameTime::GetGameTime().count();
-            bool waitedLongEnough = true;
-
-            for (LfgQueueDataContainer::iterator itQueue = QueueDataStore.begin(); itQueue != QueueDataStore.end(); )
-            {
-                if (currTime - itQueue->second.joinTime < sLFGMgr->MinTime()) {
-                    waitedLongEnough = false;
-                    break;
-                }
-            }
-
-            if (waitedLongEnough) {
-                uint8 roleCheckResult = LFGMgr::CheckGroupRoles(roles);
-                strGuids.addRoles(roles);
-                itQueue->second.bestCompatible.clear(); // this may be left after a failed proposal (not cleared, because UpdateQueueTimers would try to generate it with every update)
-                //UpdateBestCompatibleInQueue(itQueue, strGuids);
-                AddToCompatibles(strGuids);
-                if (roleCheckResult && roleCheckResult <= 15)
-                    foundMask |= ( (((uint64)1) << (roleCheckResult - 1)) | (((uint64)1) << (16 + roleCheckResult - 1)) | (((uint64)1) << (32 + roleCheckResult - 1)) | (((uint64)1) << (48 + roleCheckResult - 1)) );
-                return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
-            }
+            uint8 roleCheckResult = LFGMgr::CheckGroupRoles(roles);
+            strGuids.addRoles(roles);
+            itQueue->second.bestCompatible.clear(); // this may be left after a failed proposal (not cleared, because UpdateQueueTimers would try to generate it with every update)
+            //UpdateBestCompatibleInQueue(itQueue, strGuids);
+            AddToCompatibles(strGuids);
+            if (roleCheckResult && roleCheckResult <= 15)
+                foundMask |= ( (((uint64)1) << (roleCheckResult - 1)) | (((uint64)1) << (16 + roleCheckResult - 1)) | (((uint64)1) << (32 + roleCheckResult - 1)) | (((uint64)1) << (48 + roleCheckResult - 1)) );
+            return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
         }
 
         if (numPlayers > MAXGROUPSIZE)
@@ -403,8 +390,26 @@ namespace lfg
             LFGMgr::CheckGroupRoles(proposalRoles);          // assing new roles
         }
 
+        bool waitedLongEnough = true;
+
+        // check if its been at least n seconds since all players joined, when < MAXGROUPSIZE
+        if (numPlayers != MAXGROUPSIZE && numPlayers >= sLFGMgr->MinPlayers()) {
+            time_t currTime = GameTime::GetGameTime().count();
+
+            for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
+            {
+                LfgQueueDataContainer::iterator itr = QueueDataStore.find(check.guids[i]);
+                LOG_ERROR("LFG", "Now: {}, JoinTime: {}, Diff: {}, MinTime: {}", currTime, itr.joinTime, currTime - itr.joinTime sLFGMgr->MinTime())
+
+                if (currTime - itr.joinTime < sLFGMgr->MinTime()) {
+                    waitedLongEnough = false;
+                    break;
+                }
+            }
+        }
+
         // Enough players?
-        if (!sLFGMgr->IsTesting() && numPlayers != MAXGROUPSIZE)
+        if (!sLFGMgr->IsTesting() && numPlayers != MAXGROUPSIZE && !waitedLongEnough)
         {
             strGuids.addRoles(proposalRoles);
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
