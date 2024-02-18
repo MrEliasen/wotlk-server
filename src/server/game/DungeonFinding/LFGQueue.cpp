@@ -399,7 +399,7 @@ namespace lfg
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
             {
                 LfgQueueData queuedPlayer = QueueDataStore[check.guids[i]];
-                LOG_ERROR("LFG", "Now: {}, JoinTime: {}, Diff: {}, MinTime: {}",currTime, queuedPlayer.joinTime, currTime - queuedPlayer.joinTime sLFGMgr->MinTime())
+                LOG_ERROR("LFG", "Now: {}, JoinTime: {}, Diff: {}, MinTime: {}",currTime, queuedPlayer.joinTime, currTime - queuedPlayer.joinTime sLFGMgr->MinTime());
 
                 if (currTime - queuedPlayer.joinTime < sLFGMgr->MinTime()) {
                     waitedLongEnough = false;
