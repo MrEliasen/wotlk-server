@@ -1849,7 +1849,7 @@ namespace lfg
             }
         }
 
-        if (playerCount < m_MinPlayers || !m_Testing && !allAnswered)
+        if (playerCount < m_MinPlayers || (!m_Testing && !allAnswered))
         {
             for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
                 SendLfgUpdateProposal(it->first, proposal);
