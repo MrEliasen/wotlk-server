@@ -398,10 +398,10 @@ namespace lfg
 
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
             {
-                LfgQueueDataContainer::iterator itr = QueueDataStore.find(check.guids[i]);
-                LOG_ERROR("LFG", "Now: {}, JoinTime: {}, Diff: {}, MinTime: {}", currTime, itr.joinTime, currTime - itr.joinTime sLFGMgr->MinTime())
+                LfgQueueData queuedPlayer = QueueDataStore[check.guids[i]];
+                LOG_ERROR("LFG", "Now: {}, JoinTime: {}, Diff: {}, MinTime: {}",currTime, queuedPlayer.joinTime, currTime - queuedPlayer.joinTime sLFGMgr->MinTime())
 
-                if (currTime - itr.joinTime < sLFGMgr->MinTime()) {
+                if (currTime - queuedPlayer.joinTime < sLFGMgr->MinTime()) {
                     waitedLongEnough = false;
                     break;
                 }
