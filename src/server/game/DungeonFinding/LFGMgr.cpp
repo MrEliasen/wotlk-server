@@ -1841,11 +1841,13 @@ namespace lfg
         bool allAnswered = true;
         uint32 playerCount = 0;
 
-        for (LfgProposalPlayerContainer::const_iterator itPlayers = proposal.players.begin(); itPlayers != proposal.players.end(); ++itPlayers)
+        for (LfgProposalPlayerContainer::const_iterator itPlayers = proposal.players.begin(); itPlayers != proposal.players.end(); ++itPlayers) {
             playerCount++;
 
-            if (itPlayers->second.accept != LFG_ANSWER_AGREE)   // No answer (-1) or not accepted (0)
+            if (itPlayers->second.accept != LFG_ANSWER_AGREE) { // No answer (-1) or not accepted (0)
                 allAnswered = false;
+            }
+        }
 
         if (playerCount < m_MinPlayers || !m_Testing && !allAnswered)
         {

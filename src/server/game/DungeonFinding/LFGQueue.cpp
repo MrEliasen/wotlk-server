@@ -303,7 +303,7 @@ namespace lfg
 
             for (LfgQueueDataContainer::iterator itQueue = QueueDataStore.begin(); itQueue != QueueDataStore.end(); )
             {
-                if (currTime - itQueue->second.joinTime < sLFGMgr->MinTime() * SECOND) {
+                if (currTime - itQueue->second.joinTime < sLFGMgr->MinTime()) {
                     waitedLongEnough = false;
                     break;
                 }
