@@ -575,10 +575,16 @@ namespace lfg
         static void SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data);
         // change min players and time
         void SetMinPlayers(uint32 minPlayers);
+        // change min queue time for < 5 players
+        void SetMinTime(uint32 minTime);
         // debug lfg command
         void ToggleTesting();
         /// For 1 player queue testing
         [[nodiscard]] bool IsTesting() const { return m_Testing; }
+        /// For < 5 player queue
+        [[nodiscard]] bool MinPlayers() const { return m_MinPlayers; }
+        /// For < 5 player queue
+        [[nodiscard]] bool MinTime() const { return m_MinTime; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
 
@@ -634,6 +640,7 @@ namespace lfg
         LfgGroupDataContainer GroupsStore;                 ///< Group data
         bool m_Testing;
         uint32 m_MinPlayers;
+        uint32 m_MinTime;
     };
 
     template <typename T, FMT_ENABLE_IF(std::is_enum_v<T>)>

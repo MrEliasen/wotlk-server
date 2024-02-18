@@ -42,7 +42,7 @@
 
 namespace lfg
 {
-    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false), m_MinPlayers(5)
+    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false), m_MinPlayers(2), m_MinTime(30)
     {
         for (uint8 team = 0; team < 2; ++team)
         {
@@ -800,6 +800,11 @@ namespace lfg
               << ". Dungeons (" << uint32(dungeons.size()) << "): " << ConcatenateDungeons(dungeons);
             LOG_DEBUG("lfg", "{}", o.str());
         }*/
+    }
+
+    void LFGMgr::SetMinTime(uint32 minTime = 30)
+    {
+        m_MinTime = minTime;
     }
 
     void LFGMgr::SetMinPlayers(uint32 minPlayers = 2)
