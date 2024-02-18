@@ -42,7 +42,7 @@
 
 namespace lfg
 {
-    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(s->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false), m_MinPlayers(5)
+    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false), m_MinPlayers(5)
     {
         for (uint8 team = 0; team < 2; ++team)
         {
