@@ -298,7 +298,7 @@ namespace lfg
         bool waitedLongEnough = hasEnoughPlayers;
 
         // check if its been at least n seconds since all players joined, when < MAXGROUPSIZE
-        if (hasEnoughPlayers) {
+        /* if (hasEnoughPlayers) {
             time_t currTime = GameTime::GetGameTime().count();
 
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
@@ -312,7 +312,7 @@ namespace lfg
                     break;
                 }
             }
-        }
+        } */
 
         // Group with less that MAXGROUPSIZE members always compatible
         if (!waitedLongEnough && !sLFGMgr->IsTesting() && check.size() == 1 && numPlayers < MAXGROUPSIZE)
