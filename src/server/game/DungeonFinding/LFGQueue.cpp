@@ -290,11 +290,32 @@ namespace lfg
             }
         }
 
-        if (numLfgGroups > 1)
+        if (numLfgGroups > 1) {
             return LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS;
+        }
+
+        bool hasEnoughPlayers = numPlayers >= sLFGMgr->MinPlayers() || sLFGMgr->MinPlayers() ==  0 || numPlayers == MAXGROUPSIZE;
+        bool waitedLongEnough = hasEnoughPlayers;
+
+        // check if its been at least n seconds since all players joined, when < MAXGROUPSIZE
+        if (hasEnoughPlayers) {
+            time_t currTime = GameTime::GetGameTime().count();
+
+            for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
+            {
+                LfgQueueData queuedPlayer = QueueDataStore[check.guids[i]];
+                uint32 waitedTime = currTime - queuedPlayer.joinTime;
+                LOG_ERROR("LFG", "Now: {}, JoinTime: {}, waitedTime: {}, MinTime: {}", currTime, queuedPlayer.joinTime, waitedTime, sLFGMgr->MinTime());
+
+                if (waitedTime < sLFGMgr->MinTime()) {
+                    waitedLongEnough = false;
+                    break;
+                }
+            }
+        }
 
         // Group with less that MAXGROUPSIZE members always compatible
-        if (!sLFGMgr->IsTesting() && check.size() == 1 && numPlayers < MAXGROUPSIZE && (numPlayers < sLFGMgr->MinPlayers() && sLFGMgr->MinPlayers() > 0))
+        if (!waitedLongEnough && !sLFGMgr->IsTesting() && check.size() == 1 && numPlayers < MAXGROUPSIZE)
         {
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(check.front());
             LfgRolesMap roles = itQueue->second.roles;
@@ -390,26 +411,8 @@ namespace lfg
             LFGMgr::CheckGroupRoles(proposalRoles);          // assing new roles
         }
 
-        bool waitedLongEnough = true;
-
-        // check if its been at least n seconds since all players joined, when < MAXGROUPSIZE
-        if (numPlayers != MAXGROUPSIZE && numPlayers >= sLFGMgr->MinPlayers()) {
-            time_t currTime = GameTime::GetGameTime().count();
-
-            for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
-            {
-                LfgQueueData queuedPlayer = QueueDataStore[check.guids[i]];
-                LOG_ERROR("LFG", "Now: {}, JoinTime: {}, Diff: {}, MinTime: {}", currTime, queuedPlayer.joinTime, currTime - queuedPlayer.joinTime, sLFGMgr->MinTime());
-
-                if (currTime - queuedPlayer.joinTime < sLFGMgr->MinTime()) {
-                    waitedLongEnough = false;
-                    break;
-                }
-            }
-        }
-
         // Enough players?
-        if (!sLFGMgr->IsTesting() && numPlayers != MAXGROUPSIZE && !waitedLongEnough)
+        if (!waitedLongEnough && !sLFGMgr->IsTesting() && numPlayers != MAXGROUPSIZE)
         {
             strGuids.addRoles(proposalRoles);
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
