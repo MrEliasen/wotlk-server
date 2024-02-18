@@ -42,7 +42,7 @@
 
 namespace lfg
 {
-    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false), m_MinPlayer(2)
+    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(s->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false), m_MinPlayers(5)
     {
         for (uint8 team = 0; team < 2; ++team)
         {
@@ -804,7 +804,7 @@ namespace lfg
 
     void LFGMgr::SetMinPlayers(uint32 minPlayers = 2)
     {
-        m_MinPlayer = MinPlayers;
+        m_MinPlayers = minPlayers;
     }
 
     void LFGMgr::ToggleTesting()
@@ -1842,7 +1842,7 @@ namespace lfg
             if (itPlayers->second.accept != LFG_ANSWER_AGREE)   // No answer (-1) or not accepted (0)
                 allAnswered = false;
 
-        if (playerCount < m_MinPlayer || !m_Testing && !allAnswered)
+        if (playerCount < m_MinPlayers || !m_Testing && !allAnswered)
         {
             for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
                 SendLfgUpdateProposal(it->first, proposal);
