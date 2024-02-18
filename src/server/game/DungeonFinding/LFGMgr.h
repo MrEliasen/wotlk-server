@@ -582,9 +582,9 @@ namespace lfg
         /// For 1 player queue testing
         [[nodiscard]] bool IsTesting() const { return m_Testing; }
         /// For < 5 player queue
-        [[nodiscard]] bool MinPlayers() const { return m_MinPlayers; }
+        [[nodiscard]] uint32 MinPlayers() const { return m_MinPlayers; }
         /// For < 5 player queue
-        [[nodiscard]] bool MinTime() const { return m_MinTime; }
+        [[nodiscard]] uint32 MinTime() const { return m_MinTime; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
 
