@@ -36,7 +36,8 @@ enum Spells
     SPELL_WRATH_OF_THE_ASTROMANCER      = 42783,
     SPELL_BLINDING_LIGHT                = 33009,
     SPELL_PSYCHIC_SCREAM                = 34322,
-    SPELL_VOID_BOLT                     = 39329
+    SPELL_VOID_BOLT                     = 39329,
+    SPELL_TRUE_BEAM                     = 33365,
 };
 
 enum Misc
@@ -59,6 +60,7 @@ struct boss_high_astromancer_solarian : public BossAI
 {
     boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
     {
+        callForHelpRange = 105.0f;
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -75,6 +77,7 @@ struct boss_high_astromancer_solarian : public BossAI
             Talk(SAY_VOID);
             me->InterruptNonMeleeSpells(false);
             scheduler.CancelAll();
+            me->SetModelVisible(true);
             me->ResumeChasingVictim();
             scheduler.Schedule(3s, [this](TaskContext context)
             {
@@ -116,13 +119,12 @@ struct boss_high_astromancer_solarian : public BossAI
     {
         Talk(SAY_AGGRO);
         BossAI::JustEngagedWith(who);
-        me->CallForHelp(105.0f);
         me->GetMotionMaster()->Clear();
 
         scheduler.Schedule(3650ms, [this](TaskContext context)
         {
             me->GetMotionMaster()->Clear();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true, true, -SPELL_WRATH_OF_THE_ASTROMANCER))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, false, true, -SPELL_WRATH_OF_THE_ASTROMANCER))
             {
                 DoCast(target, SPELL_ARCANE_MISSILES);
             }
@@ -145,6 +147,7 @@ struct boss_high_astromancer_solarian : public BossAI
         {
             me->SetReactState(REACT_PASSIVE);
             Talk(SAY_SUMMON);
+            me->RemoveAllAuras();
             me->SetModelVisible(false);
             scheduler.DelayAll(21s);
             scheduler.Schedule(6s, [this](TaskContext)
@@ -157,6 +160,7 @@ struct boss_high_astromancer_solarian : public BossAI
                         {
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
+                                DoCast(light, SPELL_TRUE_BEAM);
                                 me->SetPosition(*light);
                                 me->StopMovingOnCurrentPos();
                             }
@@ -179,6 +183,7 @@ struct boss_high_astromancer_solarian : public BossAI
                             light->RemoveAllAuras();
                             if (light->GetDistance2d(CENTER_X, CENTER_Y) < 20.0f)
                             {
+                                me->RemoveAllAuras();
                                 me->SetModelVisible(true);
                             }
                             else
@@ -226,11 +231,6 @@ struct boss_high_astromancer_solarian : public BossAI
         {
             summon->SetInCombatWithZone();
         }
-    }
-
-    bool CheckEvadeIfOutOfCombatArea() const override
-    {
-        return me->GetDistance2d(432.59f, -371.93f) > 105.0f;
     }
 };
 
