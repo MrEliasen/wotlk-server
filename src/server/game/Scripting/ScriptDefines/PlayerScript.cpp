@@ -784,19 +784,6 @@ bool ScriptMgr::CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlo
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SET_TRADE_ITEM, !script->CanSetTradeItem(player, tradedItem, tradeSlot));
 }
 
-bool ScriptMgr::CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot)
-{
-    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
-        {
-            return !script->CanSetTradeItem(player, tradedItem, tradeSlot);
-        });
-
-    if (ret && *ret)
-        return false;
-
-    return true;
-}
-
 void ScriptMgr::OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_SERVER_SIDE_VISIBILITY, script->OnSetServerSideVisibility(player, type, sec));
